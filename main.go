@@ -22,7 +22,7 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			template.Must(template.ParseFiles(filepath.Join("template",
 				t.filename)))
 	})
-	t.templ.Execute(w, nil)
+	t.templ.Execute(w, r)
 }
 
 func main() {

@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"sync"
 )
@@ -25,6 +26,7 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	port := os.Getenv("PORT")
 	r := newRoom()
 	// func Handle 第2引数に type http.Handler
 	http.Handle("/", &templateHandler{filename: "chat.html"})
@@ -36,7 +38,7 @@ func main() {
 	*/
 	go r.run()
 	// Webサーバーを開始します
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	if err := http.ListenAndServe(":"+port, nil); err != nil {
 		log.Fatal("ListenAndServe:", err)
 	}
 }

@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 	"sync"
+
+	"github.com/egapool/go-chat2/trace"
 )
 
 // templは1つのテンプレートを表します
@@ -27,7 +29,11 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
 	r := newRoom()
+	r.tracer = trace.New(os.Stdout)
 	// func Handle 第2引数に type http.Handler
 	http.Handle("/", &templateHandler{filename: "chat.html"})
 	http.Handle("/room", r)
@@ -38,6 +44,7 @@ func main() {
 	*/
 	go r.run()
 	// Webサーバーを開始します
+	log.Println("Web Server Stated. http://localhost:" + port)
 	if err := http.ListenAndServe(":"+port, nil); err != nil {
 		log.Fatal("ListenAndServe:", err)
 	}

@@ -10,6 +10,9 @@ import (
 
 	"github.com/egapool/go-chat2/trace"
 	"github.com/joho/godotenv"
+	"github.com/stretchr/gomniauth"
+	"github.com/stretchr/gomniauth/providers/google"
+	"github.com/stretchr/objx"
 )
 
 // templは1つのテンプレートを表します
@@ -25,7 +28,13 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			template.Must(template.ParseFiles(filepath.Join("template",
 				t.filename)))
 	})
-	t.templ.Execute(w, r)
+	data := map[string]interface{}{
+		"Host": r.Host,
+	}
+	if authCookie, err := r.Cookie("auth"); err == nil {
+		data["UserData"] = objx.MustFromBase64(authCookie.Value)
+	}
+	t.templ.Execute(w, data)
 }
 
 func main() {
@@ -33,6 +42,14 @@ func main() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
+
+	secretKey := os.Getenv("SECURITY_KEY")
+	googleOauthKey := os.Getenv("GOOGLE_OAUTH_KEY")
+	googleOauthSecret := os.Getenv("GOOGLE_OAUTH_SECRET")
+	gomniauth.SetSecurityKey(secretKey)
+	gomniauth.WithProviders(
+		google.New(googleOauthKey, googleOauthSecret, "http://localhost:8080/auth/callback/google"))
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
@@ -41,6 +58,9 @@ func main() {
 	r.tracer = trace.New(os.Stdout)
 	// func Handle 第2引数に type http.Handler
 	http.Handle("/", &templateHandler{filename: "chat.html"})
+	http.Handle("/chat", MustAuth(&templateHandler{filename: "chat.html"}))
+	http.Handle("/login", &templateHandler{filename: "login.html"})
+	http.HandleFunc("/auth/", loginHandler)
 	http.Handle("/room", r)
 
 	/*

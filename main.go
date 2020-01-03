@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/egapool/go-chat2/trace"
+	"github.com/joho/godotenv"
 )
 
 // templは1つのテンプレートを表します
@@ -28,6 +29,10 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"

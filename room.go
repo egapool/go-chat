@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/egapool/go-chat2/trace"
+	"github.com/egapool/go-chat/trace"
 	"github.com/gorilla/websocket"
 	"github.com/stretchr/objx"
 )

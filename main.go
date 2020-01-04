@@ -51,7 +51,7 @@ func main() {
 	googleOauthSecret := os.Getenv("GOOGLE_OAUTH_SECRET")
 	gomniauth.SetSecurityKey(secretKey)
 	gomniauth.WithProviders(
-		google.New(googleOauthKey, googleOauthSecret, "http://localhost:8080/auth/callback/google"))
+		google.New(googleOauthKey, googleOauthSecret, os.Getenv("HOST")+"/auth/callback/google"))
 
 	port := os.Getenv("PORT")
 	if port == "" {

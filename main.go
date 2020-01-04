@@ -31,7 +31,8 @@ func (t *templateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				t.filename)))
 	})
 	data := map[string]interface{}{
-		"Host": r.Host,
+		"Host":        r.Host,
+		"ws_protocol": os.Getenv("WS_PROTOCOL"),
 	}
 	if authCookie, err := r.Cookie("auth"); err == nil {
 		data["UserData"] = objx.MustFromBase64(authCookie.Value)

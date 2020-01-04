@@ -48,7 +48,7 @@
                 if (!window["WebSocket"]) {
                     alert("エラー : WebSocketに対応していないブラウザです。")
                 } else {
-                    socket = new WebSocket("ws://{{.Host}}/room");
+                    socket = new WebSocket("{{.ws_protocol}}://{{.Host}}/room");
                     socket.onclose = function() {
                         alert(" 接続が終了しました。");
                     }

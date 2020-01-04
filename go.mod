@@ -1,4 +1,4 @@
-module github.com/egapool/go-chat2
+module github.com/egapool/go-chat
 
 go 1.12
 

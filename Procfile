@@ -1,1 +1,1 @@
-web: bin/go-chat2
+web: bin/go-chat

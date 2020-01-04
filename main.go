@@ -15,6 +15,8 @@ import (
 	"github.com/stretchr/objx"
 )
 
+var avatars Avatar = UseFileSystemAvatar
+
 // templは1つのテンプレートを表します
 type templateHandler struct {
 	once     sync.Once
@@ -57,12 +59,26 @@ func main() {
 	r := newRoom()
 	r.tracer = trace.New(os.Stdout)
 	// func Handle 第2引数に type http.Handler
-	http.Handle("/", &templateHandler{filename: "chat.html"})
+	// http.Handle("/", &templateHandler{filename: "chat.html"})
 	http.Handle("/chat", MustAuth(&templateHandler{filename: "chat.html"}))
 	http.Handle("/login", &templateHandler{filename: "login.html"})
 	http.HandleFunc("/auth/", loginHandler)
 	http.Handle("/room", r)
-
+	http.HandleFunc("/logout", func(w http.ResponseWriter, r *http.Request) {
+		http.SetCookie(w, &http.Cookie{
+			Name:   "auth",
+			Value:  "",
+			Path:   "/",
+			MaxAge: -1,
+		})
+		w.Header()["Location"] = []string{"/chat"}
+		w.WriteHeader(http.StatusTemporaryRedirect)
+	})
+	http.Handle("/upload", &templateHandler{filename: "upload.html"})
+	http.HandleFunc("/uploader", uploaderHandler)
+	http.Handle("/avatars/",
+		http.StripPrefix("/avatars/",
+			http.FileServer(http.Dir("./avatars"))))
 	/*
 		チャッ ト関連の処理はバックグラウンドで行われます。
 		その結果、メインのスレッドで Web サーバーを実 行できるようになります。

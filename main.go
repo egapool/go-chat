@@ -64,7 +64,10 @@ func main() {
 	r := newRoom()
 	r.tracer = trace.New(os.Stdout)
 	// func Handle 第2引数に type http.Handler
-	// http.Handle("/", &templateHandler{filename: "chat.html"})
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header()["Location"] = []string{"/chat"}
+		w.WriteHeader(http.StatusTemporaryRedirect)
+	})
 	http.Handle("/chat", MustAuth(&templateHandler{filename: "chat.html"}))
 	http.Handle("/login", &templateHandler{filename: "login.html"})
 	http.HandleFunc("/auth/", loginHandler)

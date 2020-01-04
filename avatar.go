@@ -17,6 +17,16 @@ type Avatar interface {
 	// 場合にはErrNoAvatarURLを返します。
 	GetAvatarURL(ChatUser) (string, error)
 }
+type TryAvatars []Avatar
+
+func (a TryAvatars) GetAvatarURL(u ChatUser) (string, error) {
+	for _, avatar := range a {
+		if url, err := avatar.GetAvatarURL(u); err == nil {
+			return url, nil
+		}
+	}
+	return "", ErrNoAvatarURL
+}
 
 type AuthAvatar struct{}
 
@@ -27,7 +37,7 @@ type AuthAvatar struct{}
 	せるようになる効果があります。
 	同時に、我々のコードの意図を明確に示しています。
 */
-var UseAurhAvatar AuthAvatar
+var UseAuthAvatar AuthAvatar
 
 func (_ AuthAvatar) GetAvatarURL(u ChatUser) (string, error) {
 	url := u.AvatarURL()
